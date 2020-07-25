@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-Future<Todo> fetchCustomer(String id) async {
-  if (id == "") id = "1";
-  final response = await http.get('https://yataa-api.shrumpf.de/todos/' + id);
+Future<Todo> fetchTodo(int id) async {
+  if (id == null) id = 1;
+  final response = await http.get('http://134.255.228.171:3000/todos/' + id.toString());
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response, then parse the JSON.
@@ -15,8 +15,8 @@ Future<Todo> fetchCustomer(String id) async {
   }
 }
 
-Future<List<Todo>> fetchCustomers() async {
-  final response = await http.get('https://yataa-api.shrumpf.de/todos').timeout(Duration(seconds: 5),
+Future<List<Todo>> fetchTodos() async {
+  final response = await http.get('http://134.255.228.171:3000/todos').timeout(Duration(seconds: 5),
   onTimeout: () {
     return null;
   });

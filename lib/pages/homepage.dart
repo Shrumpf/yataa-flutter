@@ -4,21 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:helloflutter/Customer.dart';
 import './secondpage.dart';
 
-final List<String> entries = <String>["A", "B", "C"];
-
 class HomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<List<Todo>> futureCustomers;
-
+  Future<List<Todo>> futureTodos;
+final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    futureCustomers = fetchCustomers();
+    futureTodos = fetchTodos();
   }
 
   @override
@@ -38,7 +36,10 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: new Center(
+      body: new RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: new Center(
         child: FutureBuilder(
           builder: (context, projectSnap) {
             if (projectSnap.hasData) {
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                   ListTile(
                     title: Text(todo.Title),
                     onTap: () {
-                      Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => SecondPage(todo)));
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => SecondPage(Id: todo.Id, Title: todo.Title,)));
                     }
                   )
                 ],
@@ -60,7 +61,7 @@ class _HomePageState extends State<HomePage> {
             }
             return CircularProgressIndicator();
           },
-          future: futureCustomers,
+          future: futureTodos,
         )
           /*child: new ListView.builder(
               itemCount: entries.length,
@@ -71,6 +72,14 @@ class _HomePageState extends State<HomePage> {
               }
           )*/
       ),
+    )
     );
+  }
+
+  Future<void> _refresh() async {
+    List<Todo> futureTodo = await fetchTodos();
+    setState(() {
+      futureTodos = Future.value(futureTodo);
+    });
   }
 }
